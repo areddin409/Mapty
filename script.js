@@ -11,6 +11,50 @@ const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 
+class Workout {
+  date = new Date();
+  id = create_UUID();
+
+  constructor(coords, distance, duration) {
+    this.coords = coords; // [lat,lng]
+    this.distance = distance; // in miles
+    this.duration = duration; // in min
+  }
+}
+
+class Running extends Workout {
+  constructor(coords, distance, duration, cadence) {
+    super(coords, distance, duration);
+    this.cadence = cadence;
+    this.calcPace();
+  }
+
+  calcPace() {
+    // min/mile
+    this.pace = this.duration / this.distance;
+    return this.pace;
+  }
+}
+
+class Cycling extends Workout {
+  constructor(coords, distance, duration, elevationGain) {
+    super(coords, distance, duration);
+    this.elevationGain = elevationGain;
+    this.calcSpeed();
+  }
+
+  calcSpeed() {
+    //mph
+    this.speed = this.distance / (this.duration / 60);
+  }
+}
+
+// const run1 = new Running([34.76, -92.407], 5.2, 24, 178);
+// const cycle1 = new Cycling([35.76, -91.407], 27, 95, 523);
+// console.log(run1, cycle1);
+
+///////////////////////////////////////////
+//APPLICATION ARCHITECTURE
 class App {
   #map;
   #mapEvent;
@@ -33,11 +77,10 @@ class App {
 
   _loadMap(position) {
     const { latitude, longitude } = position.coords;
-    //console.log(`https://www.google.com/maps/@${latitude},${longitude},10z`);
+    // console.log(`https://www.google.com/maps/@${latitude},${longitude},10z`);
 
     const coords = [latitude, longitude];
 
-    console.log(this);
     this.#map = L.map('map').setView(coords, 13);
     //   console.log(map);
 
@@ -83,6 +126,19 @@ class App {
       .setPopupContent('Workout')
       .openPopup();
   }
+}
+
+function create_UUID() {
+  var dt = new Date().getTime();
+  var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
+    /[xy]/g,
+    function (c) {
+      var r = (dt + Math.random() * 16) % 16 | 0;
+      dt = Math.floor(dt / 16);
+      return (c == 'x' ? r : (r & 0x3) | 0x8).toString(16);
+    }
+  );
+  return uuid;
 }
 
 const app = new App();
